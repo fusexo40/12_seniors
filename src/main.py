@@ -92,10 +92,13 @@ def func(message):
         cursor = connection.cursor()
         info = cursor.execute('SELECT question FROM questions WHERE author_id=?', (message.from_user.id, )).fetchall()
         info2 = cursor.execute('SELECT question_id FROM questions WHERE author_id=?', (message.from_user.id, )).fetchall()
-        result = []
-        for i in range(1, len(info) + 1):
-            result.append(f'{i}. {info[i - 1][0]} - https://t.me/hahaton24/{info2[i - 1][0] + 136}\n')
-        bot.send_message(message.chat.id, "".join(result))
+        if len(info) == 0 or len(info2) == 0:
+            bot.send_message(message.chat.id, "У вас нет активных вопросов")
+        else:
+            result = []
+            for i in range(1, len(info) + 1):
+                result.append(f'{i}. {info[i - 1][0]} - https://t.me/hahaton24/{info2[i - 1][0] + 136}\n')
+            bot.send_message(message.chat.id, "".join(result))
         connection.commit()
         connection.close()
 
