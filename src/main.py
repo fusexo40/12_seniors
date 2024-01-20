@@ -20,23 +20,24 @@ st = []
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = telebot.types.ReplyKeyboardRemove()
-    bot.send_message(message.chat.id, "Введите номер класса ⌨️ :", reply_markup=markup)
+    connection = sqlite3.connect('users.db')
+    cursor = connection.cursor()
+    info = cursor.execute('SELECT id FROM users WHERE id=?', (message.from_user.id, ))
+    if info.fetchone() is None:
+        bot.send_message(message.chat.id, "Привет 👋! Похоже вы не зарагестрированны. Введите класс в котором вы учитесь", reply_markup=markup)
+    else:
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup.add(types.KeyboardButton("Привет 👋!"))
+        bot.send_message(message.chat.id, f"Привет 👋, {message.from_user.username}!", reply_markup=markup)
     bot.register_next_step_handler(message, add_user)
-
-
-@bot.message_handler(commands=['link'])
-def link(message):
-    markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton(text="Ссылка", url="https://t.me/hahaton24"))
-    bot.send_message(message.chat.id, "Вот ссылка на телеграм канал 📎 :", reply_markup=markup)
 
 
 def add_user(message):
     username = message.from_user.username
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(types.KeyboardButton("❓ Задать вопрос"), types.KeyboardButton("Профиль 🆔"))
-    bot.send_message(message.chat.id, f"Привет 👋, {username}! Я телеграм бот 🤖 для взаимопомощи ученикам 👨‍🎓", reply_markup=markup)
-    if message.text != "В главное меню ⬅️":
+    markup.add(types.KeyboardButton("❓ Задать вопрос"), types.KeyboardButton("Профиль 🆔"), types.KeyboardButton("Ссылка на тгк 📎"))
+    bot.send_message(message.chat.id, f"Я телеграм бот 🤖 для взаимопомощи ученикам 👨‍🎓. Все вопросы❔ и ответы❕ находятся в нашем телеграм канале", reply_markup=markup)
+    if message.text != "В главное меню ⬅️" and message.text != "Привет 👋!":
         id = message.from_user.id
         if int(message.text) >= 0 and int(message.text) <= 11:
             form = message.text
@@ -47,7 +48,6 @@ def add_user(message):
                 cursor.execute(f"""
                 INSERT INTO users (id, username, form, rating) VALUES ({id}, '{username}', {form}, 1000)
                 """)
-                bot.send_message(message.chat.id, "Похоже что вы пользуетесь нашим ботом 🤖 впервые. Все вопросы❔ и ответы❕ находятся в нашем телеграм канале, для получения ссылки 📎 на него введите команду /link")
             else:
                 db_username = cursor.execute('SELECT username FROM users WHERE id=?', (id, ))
                 if db_username != username:
@@ -81,16 +81,21 @@ def func(message):
                          text=f"Ник: {message.from_user.username}\nРейтинг: {rating}\nАктивные вопросы: {countquestions}", reply_markup=markup)
         connection.commit()
         connection.close()
+    elif message.text == "Ссылка на тгк 📎":
+        markup = types.InlineKeyboardMarkup()
+        markup.add(types.InlineKeyboardButton("Ссылка 📎", url='https://t.me/hahaton24'))
+        bot.send_message(message.chat.id, "Наш телеграмм канал", reply_markup=markup)
     elif message.text == "В главное меню ⬅️":
         add_user(message)
     elif message.text == "Мои вопросы 📝":
         connection = sqlite3.connect('users.db')
         cursor = connection.cursor()
         info = cursor.execute('SELECT question FROM questions WHERE author_id=?', (message.from_user.id, )).fetchall()
-        result = ""
+        info2 = cursor.execute('SELECT question_id FROM questions WHERE author_id=?', (message.from_user.id, )).fetchall()
+        result = []
         for i in range(1, len(info) + 1):
-            result += str(i) + ". " + info[i - 1][0] + "\n"
-        bot.send_message(message.chat.id, result)
+            result.append(f'{i}. {info[i - 1][0]} - https://t.me/hahaton24/{info2[i - 1][0] + 136}\n')
+        bot.send_message(message.chat.id, "".join(result))
         connection.commit()
         connection.close()
 
