@@ -34,7 +34,7 @@ def link(message):
 def add_user(message):
     username = message.from_user.username
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(types.KeyboardButton("❓ Задать вопрос"), types.KeyboardButton("Профиль"))
+    markup.add(types.KeyboardButton("❓ Задать вопрос"), types.KeyboardButton("Профиль 🆔"))
     bot.send_message(message.chat.id, f"Привет 👋, {username}! Я телеграм бот 🤖 для взаимопомощи ученикам 👨‍🎓", reply_markup=markup)
     if message.text != "В главное меню ⬅️":
         id = message.from_user.id
@@ -76,14 +76,14 @@ def func(message):
         countquestions = len(cursor.execute('SELECT question FROM questions WHERE author_id=?', (message.from_user.id, )).fetchall())
         rating = 1000
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        markup.add(types.KeyboardButton("Мои вопросы 📝"), types.KeyboardButton("В главное меню 🌐"))
+        markup.add(types.KeyboardButton("Мои вопросы 📝"), types.KeyboardButton("В главное меню ⬅️"))
         bot.send_message(message.chat.id,
                          text=f"Ник: {message.from_user.username}\nРейтинг: {rating}\nАктивные вопросы: {countquestions}", reply_markup=markup)
         connection.commit()
         connection.close()
-    elif message.text == "В главное меню":
+    elif message.text == "В главное меню ⬅️":
         add_user(message)
-    elif message.text == "Мои вопросы":
+    elif message.text == "Мои вопросы 📝":
         connection = sqlite3.connect('users.db')
         cursor = connection.cursor()
         info = cursor.execute('SELECT question FROM questions WHERE author_id=?', (message.from_user.id, )).fetchall()
