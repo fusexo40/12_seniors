@@ -1,18 +1,18 @@
 import telebot
 import os
 import sqlite3
-import time
 from dotenv_vault import load_dotenv
 from scripts.create_db import CreateDB
+from sourses.variables import *
 from telebot import types
 
 
 CreateDB()
 load_dotenv()
 token = os.getenv("token")
+tgk_id = os.getenv("tgc_id")
+tgk_link = os.getenv("tgk_link")
 bot = telebot.TeleBot(token)
-tconv = lambda x: time.strftime("%H:%M:%S %d.%m.%Y", time.localtime(x))
-subject_list = ["Английский язык", "Алгебра", "Геометрия", "Физика", "Информатика", "Русский язык", "Литература", "Биология", "Химия", "География", "История", "Обществознание"]
 st = []
 
 
@@ -82,7 +82,7 @@ def func(message):
         connection.close()
     elif message.text == "Ссылка на тгк 📎":
         markup = types.InlineKeyboardMarkup()
-        markup.add(types.InlineKeyboardButton("Ссылка 📎", url='https://t.me/hahaton24'))
+        markup.add(types.InlineKeyboardButton("Ссылка 📎", url=tgk_link))
         bot.send_message(message.chat.id, "Наш телеграмм канал", reply_markup=markup)
     elif message.text == "В главное меню ⬅️":
         add_user(message)
@@ -139,7 +139,7 @@ def class_number(message, st):
         cursor.execute(f"INSERT INTO questions (question, create_date, author_id) VALUES ('{st[0]}', '{tconv(message.date)}', {int(message.from_user.id)})")
         bot.send_message(message.chat.id, "Похоже, что вашего вопроса еще не было в нашем телеграм канале")
         q_id = len(cursor.execute('SELECT question FROM questions').fetchall())
-        bot.send_message("-1002010810009", f'Вопрос №{q_id}\n{st[0]}\n#{"".join(st[1].split(" "))} \n#{st[2]}_класс')
+        bot.send_message(tgk_id, f'Вопрос №{q_id}\n{st[0]}\n#{"".join(st[1].split(" "))} \n#{st[2]}_класс')
         bot.send_message(message.chat.id, f"Ваш вопрос отправлен в телеграм канал ✅", reply_markup=markup)
     connection.commit()
     connection.close()
