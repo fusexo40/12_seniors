@@ -3,7 +3,6 @@ import os
 import sqlite3
 import time
 from dotenv_vault import load_dotenv
-from structures.UserProfile import UserProfile
 from scripts.create_db import CreateDB
 from telebot import types
 
