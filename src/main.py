@@ -5,6 +5,7 @@ from dotenv_vault import load_dotenv
 from scripts.create_db import CreateDB
 from sourses.variables import *
 from telebot import types
+from data.subloader import get_json #new async
 
 
 CreateDB()
@@ -105,7 +106,7 @@ def func(message):
 def ask_q(message, st):
     st.append(message.text)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    for i in subject_list:
+    for i in await get_json("lessons.json"):
         markup.add(types.KeyboardButton(i))
     bot.send_message(message.chat.id, f"Выберите предмет 📕 к которому относится этот вопрос ➡️", reply_markup=markup)
     bot.register_next_step_handler(message, subject, st)
