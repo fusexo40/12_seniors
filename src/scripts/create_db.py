@@ -14,7 +14,7 @@ def CreateDB():
     ''')
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS questions(
-    question_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    question_id INTEGER PRIMARY KEY AUTO_INCREMENT,
     author_id INTEGER,
     question TEXT,
     create_date TEXT
