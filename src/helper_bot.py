@@ -21,21 +21,22 @@ dp = Dispatcher()
 @dp.message(F.text == "/start")
 async def start(message: Message):
     await message.answer(f"Привет 👋! Похоже вы не зарегистрированы. Введите класс в котором вы учитесь",
-                         reply_markup=keyboards.paginator())
+                         reply_markup=keyboards.link_kb)
 
 
-@dp.callback_query(keyboards.Pagination.filter(F.action.in_(["prev", "next"])))
-async def pagination_handler(call: CallbackQuery, callback_data: keyboards.Pagination):
-    page_num = int(callback_data.page)
-    page = page_num - 1 if page_num > 0 else 0
-    if callback_data.action == "next":
-        page = page_num + 1 if page_num < (len("smth") - 1) else page_num
-    with suppress(TelegramBadRequest):
-        await call.message.edit_text(
-            f"some text {page}",
-            reply_markup=keyboards.paginator(page)
-        )
-    await call.answer()
+# @dp.callback_query(keyboards.Pagination.filter(F.action.in_(["prev", "next", "page"])))
+# async def pagination_handler(call: CallbackQuery, callback_data: keyboards.Pagination):
+#    page_num = int(callback_data.page)
+#    if callback_data.action == "prev":
+#        page_num -= 1 if page_num > 0 else 0
+#    if callback_data.action == "next":
+#        page_num += 1 if page_num < (len("smth") - 1) else 0
+#    with suppress(TelegramBadRequest):
+#        await call.message.edit_text(
+#            f"some text {page_num}",
+#            reply_markup=keyboards.paginator(page_num)
+#        )
+#    await call.answer()
 
 
 async def main() -> None:

@@ -11,15 +11,16 @@ from aiogram.filters.callback_data import CallbackData
 class Pagination(CallbackData, prefix="pag"):
     action: str
     page: int
+    pages_count: int
 
 
 def paginator(page: int = 0):
     builder = InlineKeyboardBuilder()
     builder.row(
         InlineKeyboardButton(text="⬅", callback_data=Pagination(action="prev", page=page).pack()),
+        InlineKeyboardButton(text=f"{page + 1}", callback_data=Pagination(action="page", page=page).pack()),
         InlineKeyboardButton(text="➡", callback_data=Pagination(action="next", page=page).pack()),
-        width=2
-
+        width=3
     )
     return builder.as_markup()
 
@@ -37,10 +38,12 @@ def class_kb():
     return builder.as_markup(resize_keyboard=True)
 
 
-main_kb = InlineKeyboardMarkup(
+link_kb = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text="Наше сообщество", url="tg://resolve?domain=dz_helper_chanel")
         ]
     ]
 )
+
+
