@@ -34,14 +34,14 @@ print(TOKEN)
 logging.basicConfig(level=logging.INFO)
 bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
 storage = MemoryStorage()
-dp = Dispatcher()
+dp = Dispatcher(storage=storage)
 router = Router()
 dp.include_router(router)
 
 class UserStates(StatesGroup):
     NOTREGISTER = State()
 
-@dp.message(CommandStart, StateFilter(None))
+@dp.message(CommandStart)
 async def start(message: Message, state: FSMContext):
         cursor = conn.cursor()
         info = cursor.execute(f"SELECT id FROM userdb WHERE id={message.from_user.id}")
@@ -50,9 +50,6 @@ async def start(message: Message, state: FSMContext):
         await state.clear()
         if info is None:
             await state.set_state(UserStates.NOTREGISTER)
-            current_state = await state.get_state()
-            print(UserStates.NOTREGISTER)
-            print(current_state)
         else:
             await message.answer("Первет", reply_markup=keyboards.main_kb )
 
@@ -62,6 +59,7 @@ async def not_registered(message: Message, state: FSMContext):
     print('fvgbhnj')
     await message.answer("Первет, Ты не зареган, чушпан. Введи свой класс обучения")
     form = message.text
+    state.clear()
     with conn.cursor as cursor:
         cursor.execute(f"""
                     INSERT INTO users (id, username, form, rating) VALUES ({message.from_user.id}, '{message.from_user.username}', {form}, 1000)
